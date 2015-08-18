@@ -54,6 +54,7 @@ var Agent = (function (_super) {
     return Agent;
 })(Node);
 module.exports = Agent;
+
 },{"./ElementState":4,"./Global":9,"./Node":10}],2:[function(require,module,exports){
 /// <reference path="../typings/phaser/phaser.comments.d.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
@@ -165,6 +166,7 @@ var Edge = (function (_super) {
     return Edge;
 })(Element);
 module.exports = Edge;
+
 },{"./Element":3,"./ElementState":4,"./Global":9}],3:[function(require,module,exports){
 /// <reference path="../typings/phaser/phaser.comments.d.ts" />
 var Element = (function () {
@@ -202,6 +204,7 @@ var Element = (function () {
     return Element;
 })();
 module.exports = Element;
+
 },{}],4:[function(require,module,exports){
 var ElementState = {
     BAD: 0,
@@ -209,6 +212,7 @@ var ElementState = {
     SELECTED: 2
 };
 module.exports = ElementState;
+
 },{}],5:[function(require,module,exports){
 /// <reference path="../typings/phaser/phaser.comments.d.ts" />
 var TitleState = require('./TitleState');
@@ -236,6 +240,7 @@ var Game = (function () {
     return Game;
 })();
 module.exports = Game;
+
 },{"./GameRunningState":7,"./TitleState":12}],6:[function(require,module,exports){
 var GameInfo = (function () {
     function GameInfo() {
@@ -258,6 +263,7 @@ var GameInfo = (function () {
     return GameInfo;
 })();
 module.exports = GameInfo;
+
 },{}],7:[function(require,module,exports){
 /// <reference path="../typings/phaser/phaser.comments.d.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
@@ -286,6 +292,7 @@ var GameRunningState = (function (_super) {
         var cLevel = gI.getLevel();
         this.levelData = allLevelsData[cLevel];
         gI.setLevel((cLevel + 1) % allLevelsData.length);
+        console.log(this.levelData.adjMatrix);
         this.gameState = new GameState(this.levelData.adjMatrix, this.levelData.immunityNumber);
         this.agent = null;
         this.moves = new Array();
@@ -423,6 +430,7 @@ var GameRunningState = (function (_super) {
     return GameRunningState;
 })(Phaser.State);
 module.exports = GameRunningState;
+
 },{"./Agent":1,"./Edge":2,"./ElementState":4,"./GameInfo":6,"./GameState":8,"./Node":10,"./Ripple":11}],8:[function(require,module,exports){
 var GameState = (function () {
     function GameState(adjacencyMatrix, immunity) {
@@ -439,19 +447,24 @@ var GameState = (function () {
         this.numDirtyNodes = this.nodeStates.length;
     };
     GameState.prototype.hasContaminatedNeighbour = function (node, toExclude) {
-        for (var neighbour in this.adjacencyMatrix[node]) {
-            if (this.nodeStates[neighbour] == -1)
+        for (var i = 0; i < this.adjacencyMatrix[node].length; i++) {
+            if (i == toExclude || this.adjacencyMatrix[node][i] == 0)
+                continue;
+            else if (this.nodeStates[i] == -1) {
+                console.log(node + " has contaminated neighbour " + i);
                 return true;
+            }
         }
         return false;
     };
     GameState.prototype.getUpdatedState = function (node, move) {
         var nodeState = this.nodeStates[node];
         if (node == move || node == this.agentPos) {
-            this.numDirtyNodes--;
+            if (nodeState == -1)
+                this.numDirtyNodes--;
             return 0;
         }
-        else if (this.nodeStates[node] > -1 && this.hasContaminatedNeighbour(node, -1)) {
+        else if (nodeState > -1 && this.hasContaminatedNeighbour(node, -1)) {
             if (nodeState + 1 >= this.immunity) {
                 this.numDirtyNodes++;
                 return -1;
@@ -465,7 +478,8 @@ var GameState = (function () {
             return nodeState;
     };
     GameState.prototype.updateNodeStates = function (move) {
-        var toCheckLater;
+        console.log("Herre");
+        var toCheckLater = new Array();
         for (var i = 0; i < this.nodeStates.length; i++) {
             var temp = this.getUpdatedState(i, move);
             if (temp == -2)
@@ -474,23 +488,23 @@ var GameState = (function () {
                 this.nodeStates[i] = temp;
         }
         for (var node in toCheckLater) {
-            if (this.hasContaminatedNeighbour(node, -1))
+            if (this.hasContaminatedNeighbour(node, -1)) {
                 this.nodeStates[node] += 1;
+            }
             else {
                 this.nodeStates[node] = 0;
-                this.numDirtyNodes--;
             }
         }
+        this.agentPos = move;
+        console.log("numDirtyNodes = " + this.numDirtyNodes);
     };
     GameState.prototype.existsContaminatedNode = function () {
         return (this.numDirtyNodes > 0);
     };
-    GameState.prototype.getAvailableMoves = function () {
-        return this.adjacencyMatrix[this.agentPos];
-    };
     return GameState;
 })();
 module.exports = GameState;
+
 },{}],9:[function(require,module,exports){
 var Global = {
     COLOR_BG: 0x131D23,
@@ -506,6 +520,7 @@ var Global = {
     SIZE_AGENT: 20
 };
 module.exports = Global;
+
 },{}],10:[function(require,module,exports){
 /// <reference path="../typings/phaser/phaser.comments.d.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
@@ -593,6 +608,7 @@ var Node = (function (_super) {
     return Node;
 })(Element);
 module.exports = Node;
+
 },{"./Element":3,"./ElementState":4,"./Global":9}],11:[function(require,module,exports){
 /// <reference path="../typings/phaser/phaser.comments.d.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
@@ -624,6 +640,7 @@ var Ripple = (function (_super) {
     return Ripple;
 })(Node);
 module.exports = Ripple;
+
 },{"./ElementState":4,"./Global":9,"./Node":10}],12:[function(require,module,exports){
 /// <reference path="../typings/phaser/phaser.comments.d.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
@@ -691,9 +708,11 @@ var TitleState = (function (_super) {
     return TitleState;
 })(Phaser.State);
 module.exports = TitleState;
+
 },{"./Global":9}],13:[function(require,module,exports){
 var Game = require('./Game');
 window.onload = function () {
     var game = new Game();
 };
+
 },{"./Game":5}]},{},[13]);

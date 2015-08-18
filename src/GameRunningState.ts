@@ -38,7 +38,7 @@ class GameRunningState extends Phaser.State {
 		var cLevel = gI.getLevel();
 		this.levelData = allLevelsData[cLevel];
 		gI.setLevel((cLevel + 1) % allLevelsData.length);
-
+		console.log(this.levelData.adjMatrix)
 		this.gameState = new GameState(this.levelData.adjMatrix, this.levelData.immunityNumber);
 
 		this.agent = null;
