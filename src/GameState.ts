@@ -32,7 +32,7 @@ class GameState {
             else if (this.nodeStates[i] == -1) 
             {
 
-                console.log(node + " has contaminated neighbour " + i)
+           //     console.log(node + " has contaminated neighbour " + i)
                 return true;
             }
         }
@@ -42,10 +42,20 @@ class GameState {
 	getUpdatedState(node : number, move : number)
     {
         var nodeState = this.nodeStates[node];
+
+		var toRet = nodeState
         if (node == move || node == this.agentPos)
         {
             if(nodeState == -1) this.numDirtyNodes--;
-            return 0;
+		// 	if(node == move)
+		// 	{
+		// //		console.log("move == " + node + " so setting exposure to 0")
+		// 	}
+		// 	else 
+		// 	{
+		// //		console.log("agentPos ==" + node + " so setting exposure to 0")
+		// 	}
+			toRet = 0
         }
         // else if (toContaminate.get(nodeState[0], False)) return (nodeState[0],-1)
         else if (nodeState > -1 && this.hasContaminatedNeighbour(node, -1))
@@ -53,37 +63,44 @@ class GameState {
             if (nodeState + 1 >= this.immunity)
             {
                 this.numDirtyNodes++;
-                return -1;
+                toRet = -1;
             }
-           else if (this.hasContaminatedNeighbour(node, move)) return nodeState + 1;
-           else return -2;
+           else if (this.hasContaminatedNeighbour(node, move)) toRet= nodeState + 1;
+           else toRet = -2;
         }
-        else return nodeState;
+		//console.log("setting state of node " + node + " to " + toRet )
+        return toRet
     }
 	
 	updateNodeStates(move : number)
     {
-        console.log("Herre")
+        //console.log("Going from " + this.agentPos + " to " + move)
         var toCheckLater : number[] = new Array()
         for (var i = 0; i < this.nodeStates.length; i++)
         {
             var temp = this.getUpdatedState(i,move);
+
             if(temp == -2) toCheckLater.push(i);
             else this.nodeStates[i] = temp;
         }
-        for (var node in toCheckLater)
+		//console.log(toCheckLater)
+        for (var i = 0; i < toCheckLater.length; i++)
         {
+			var node = toCheckLater[i]
+		//	console.log("checking later " + node )
             if(this.hasContaminatedNeighbour(node,-1)) 
             {
                 this.nodeStates[node] += 1;
             }
             else
             {
+				//console.log(node + " has no contaminated neighbour so setting exposure to 0")
                 this.nodeStates[node] = 0;
             }
         }
         this.agentPos = move
-        console.log("numDirtyNodes = " + this.numDirtyNodes)
+       // console.log("numDirtyNodes = " + this.numDirtyNodes)
+        //console.log(this.nodeStates)
     }
 
     existsContaminatedNode()
