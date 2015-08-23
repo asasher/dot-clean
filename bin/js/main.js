@@ -451,7 +451,7 @@ var GameState = (function () {
             if (i == toExclude || this.adjacencyMatrix[node][i] == 0)
                 continue;
             else if (this.nodeStates[i] == -1) {
-                //     console.log(node + " has contaminated neighbour " + i)
+                //console.log(node + " has contaminated neighbour " + i)
                 return true;
             }
         }
@@ -489,19 +489,23 @@ var GameState = (function () {
     GameState.prototype.updateNodeStates = function (move) {
         //console.log("Going from " + this.agentPos + " to " + move)
         var toCheckLater = new Array();
+        var newStates = new Array(this.nodeStates.length);
         for (var i = 0; i < this.nodeStates.length; i++) {
             var temp = this.getUpdatedState(i, move);
-            if (temp == -2)
+            if (temp == -2) {
                 toCheckLater.push(i);
+                newStates[i] = this.nodeStates[i];
+            }
             else
-                this.nodeStates[i] = temp;
+                newStates[i] = temp;
         }
+        this.nodeStates = newStates;
         //console.log(toCheckLater)
         for (var i = 0; i < toCheckLater.length; i++) {
             var node = toCheckLater[i];
             //	console.log("checking later " + node )
             if (this.hasContaminatedNeighbour(node, -1)) {
-                this.nodeStates[node] += 1;
+                this.nodeStates[node] = this.nodeStates[node] + 1;
             }
             else {
                 //console.log(node + " has no contaminated neighbour so setting exposure to 0")

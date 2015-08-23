@@ -1,3 +1,6 @@
+import sys
+from glob import glob
+
 def updateFile(filename):
 	f = open(filename,'r')
 	numNodes = int(f.readline())
@@ -8,7 +11,8 @@ def updateFile(filename):
 	for i in range(numNodes):
 		x,y = [float(x) for x in f.readline().split() ]
 		positions.append([x,y])
-	toWrite = toWrite + centerGraph(positions)
+	immunity = f.readline()
+	toWrite = toWrite + centerGraph(positions) + immunity
 	f.close()
 	f = open(filename,'w')
 	f.write(toWrite)
@@ -37,8 +41,8 @@ def centerGraph(positions):
 
 	newCenterX = 0.5
 	newCenterY = 0.5
-	scaleX = 0.9/(abs(minX-maxX))
-	scaleY = 0.9/(abs(minY-maxY))
+	scaleX = 0.8/(abs(minX-maxX))
+	scaleY = 0.8/(abs(minY-maxY))
 
 	toRet = ""
 	for i in range(numPoints):
@@ -46,13 +50,14 @@ def centerGraph(positions):
 		toRet = toRet + str(positions[i][0]) + " "
 		positions[i][1] = (positions[i][1]-yCenter)*scaleY+newCenterY
 		toRet = toRet + str(positions[i][1]) + " "
-		if(not i == numPoints-1):
-			toRet = toRet + "\n"
+		toRet = toRet + "\n"
 	return toRet
 
 from os import listdir
 from os.path import isfile, join
-files = [ f for f in listdir() if isfile(f) and f[len(f)-3:]== 'txt' ]	
+
+#files = [ f for f in listdir() if isfile(f) and f[len(f)-3:]== 'txt' ]	
+files = [ f for f in glob(sys.argv[1]) if isfile(f) and f[len(f)-3:]== 'txt' ]	
 for filename in files:
 	print(filename)
 	updateFile(filename)

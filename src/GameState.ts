@@ -32,7 +32,7 @@ class GameState {
             else if (this.nodeStates[i] == -1) 
             {
 
-           //     console.log(node + " has contaminated neighbour " + i)
+               //console.log(node + " has contaminated neighbour " + i)
                 return true;
             }
         }
@@ -76,13 +76,22 @@ class GameState {
     {
         //console.log("Going from " + this.agentPos + " to " + move)
         var toCheckLater : number[] = new Array()
+		var newStates : number[] = new Array(this.nodeStates.length)
+		
+		
         for (var i = 0; i < this.nodeStates.length; i++)
         {
             var temp = this.getUpdatedState(i,move);
 
-            if(temp == -2) toCheckLater.push(i);
-            else this.nodeStates[i] = temp;
+            if(temp == -2) 
+			{
+				toCheckLater.push(i);
+				newStates[i] = this.nodeStates[i]
+			}
+				
+            else newStates[i] = temp;
         }
+		this.nodeStates = newStates
 		//console.log(toCheckLater)
         for (var i = 0; i < toCheckLater.length; i++)
         {
@@ -90,15 +99,15 @@ class GameState {
 		//	console.log("checking later " + node )
             if(this.hasContaminatedNeighbour(node,-1)) 
             {
-                this.nodeStates[node] += 1;
+               this.nodeStates[node] = this.nodeStates[node] + 1;
             }
             else
             {
 				//console.log(node + " has no contaminated neighbour so setting exposure to 0")
-                this.nodeStates[node] = 0;
+               this.nodeStates[node] = 0;
             }
         }
-        this.agentPos = move
+		this.agentPos = move
        // console.log("numDirtyNodes = " + this.numDirtyNodes)
         //console.log(this.nodeStates)
     }
