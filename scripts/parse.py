@@ -13,7 +13,6 @@ while at < len(lines):
 	
 	matrix = [[int(x) for x in lines[i].split()] for i in range(at, at + n)]	
 	at = at + n
-	
 	nodes = [[float(x) for x in lines[i].split()] for i in range(at, at + n)]
 	at = at + n
 	
@@ -28,5 +27,5 @@ while at < len(lines):
 	
 	data.append(datum)
 	
-print json.dumps(data, indent=4, sort_keys=False)
+print(json.dumps(data, indent=4, sort_keys=False))
 	
